@@ -14,5 +14,9 @@
     {% if coin_name %}
         <h2>You searched for: {{ coin_name }}</h2>
     {% endif %}
+
+    {% if price %}
+        <h2>Current Price (USD): {{ price }}</h2>
+    {% endif %}
 </body>
 </html>
