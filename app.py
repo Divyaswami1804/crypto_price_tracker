@@ -1,45 +1,55 @@
 from flask import Flask, render_template, request
-import requests
-import time
+import requests  # For API calls
+import sqlite3   # For database
 
 app = Flask(__name__)
 
-# Simple in-memory cache
-crypto_cache = {}
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    coin_name = None
+    price = None
+    last_searches = []
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    crypto_price = None
-    error = None
+    # Connect to DB
+    conn = sqlite3.connect('crypto.db')
+    cur = conn.cursor()
 
-    if request.method == "POST":
-        crypto = request.form["crypto"].lower()
-        current_time = time.time()
+    if request.method == 'POST':
+        coin_name = request.form['coin'].lower()
 
-        # If we have cached and it's fresh (60 sec)
-        if crypto in crypto_cache and current_time - crypto_cache[crypto]["timestamp"] < 60:
-            crypto_price = crypto_cache[crypto]["price"]
+        # Make API call
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin_name}&vs_currencies=usd"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            if coin_name in data:
+                price = data[coin_name]['usd']
+
+                # Save to DB
+                cur.execute(
+                    "INSERT INTO searches (coin_name, price) VALUES (?, ?)",
+                    (coin_name, price)
+                )
+                conn.commit()
+            else:
+                price = 'Invalid coin name'
         else:
-            url = f"https://api.coingecko.com/api/v3/simple/price?ids={crypto}&vs_currencies=usd"
-            try:
-                response = requests.get(url)
-                if response.status_code == 200:
-                    data = response.json()
-                    crypto_price = data[crypto]["usd"]
+            price = 'API request failed'
 
-                    # Cache it
-                    crypto_cache[crypto] = {
-                        "price": crypto_price,
-                        "timestamp": current_time
-                    }
+    # Always fetch last 5 searches
+    cur.execute(
+        "SELECT coin_name, price, timestamp FROM searches ORDER BY id DESC LIMIT 5"
+    )
+    last_searches = cur.fetchall()
+    conn.close()
 
-                    # Sleep to avoid hitting limit too fast
-                    time.sleep(2)
+    return render_template(
+        'index.html',
+        coin_name=coin_name,
+        price=price,
+        last_searches=last_searches
+    )
 
-                else:
-                    error = f"API Error: {response.status_code}"
-            except Exception as e:
-                error = str(e)
-
-    return render_template("index.html", crypto_price=crypto_price, error=error)
-
+if __name__ == '__main__':
+    app.run(debug=True)
