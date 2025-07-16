@@ -1,22 +1,694 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Price Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 25%, #ffa0b4 50%, #ff91a4 75%, #ff8a95 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Floating elements background */
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .cloud:before {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+        }
+
+        .cloud1 {
+            width: 80px;
+            height: 40px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .cloud1:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud2 {
+            width: 60px;
+            height: 30px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .cloud2:before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            right: 10px;
+        }
+
+        .cloud3 {
+            width: 100px;
+            height: 50px;
+            top: 10%;
+            right: 20%;
+            animation-delay: 4s;
+        }
+
+        .cloud3:before {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 15px;
+        }
+
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        .star1 {
+            top: 15%;
+            left: 75%;
+            animation-delay: 0s;
+        }
+
+        .star2 {
+            top: 70%;
+            left: 20%;
+            animation-delay: 1s;
+        }
+
+        .star3 {
+            top: 30%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .star4 {
+            top: 80%;
+            right: 30%;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-40px) translateX(-5px); }
+            75% { transform: translateY(-20px) translateX(-10px); }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .container {
+            text-align: center;
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            border: 3px solid rgba(255, 182, 193, 0.6);
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3),
+                        0 0 20px rgba(255, 182, 193, 0.4);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .container::before {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            font-size: 1.5rem;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        .container::after {
+            content: '💖';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 1.5rem;
+            animation: twinkle 2s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+
+        h1 {
+            font-family: 'Comfortaa', cursive;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #dc143c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 10px rgba(255, 105, 180, 0.3);
+            position: relative;
+        }
+
+        h1::after {
+            content: '🌸';
+            position: absolute;
+            top: 0;
+            right: -40px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #ff69b4;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .subtitle::before {
+            content: '🚀';
+            margin-right: 8px;
+        }
+
+        .subtitle::after {
+            content: '💫';
+            margin-left: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 25px;
+            font-size: 1rem;
+            background: rgba(255, 240, 245, 0.9);
+            border: 2px solid #ffb6c1;
+            border-radius: 25px;
+            color: #d1477a;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+            transform: scale(1.02);
+            background: rgba(255, 228, 225, 0.95);
+        }
+
+        input[type="text"]::placeholder {
+            color: #ff91a4;
+            font-weight: 400;
+        }
+
+        .track-btn {
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #dc143c);
+            border: none;
+            color: white;
+            padding: 18px 35px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Comfortaa', cursive;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+
+        .track-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .track-btn:hover::before {
+            left: 100%;
+        }
+
+        .track-btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.6);
+        }
+
+        .track-btn:active {
+            transform: scale(0.98) translateY(0px);
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255, 240, 245, 0.9), rgba(255, 228, 225, 0.9));
+            border-radius: 20px;
+            border: 2px solid #ffb6c1;
+            animation: slideIn 0.5s ease-out;
+            position: relative;
+        }
+
+        .result-section::before {
+            content: '🎉';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            font-size: 1.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .coin-name {
+            font-family: 'Comfortaa', cursive;
+            font-size: 1.4rem;
+            color: #ff1493;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .coin-name::before {
+            content: '💎';
+            margin-right: 10px;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .currency {
+            font-size: 1.2rem;
+            color: #ff91a4;
+            font-weight: 600;
+        }
+
+        .currency::before {
+            content: '✨';
+            margin-right: 5px;
+        }
+
+        .currency::after {
+            content: '✨';
+            margin-left: 5px;
+        }
+
+        /* Kawaii floating hearts */
+        .heart {
+            position: absolute;
+            color: #ff69b4;
+            font-size: 1.5rem;
+            animation: floatHeart 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .heart1 {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .heart2 {
+            top: 60%;
+            right: 5%;
+            animation-delay: 2s;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h1::after {
+                right: -30px;
+            }
+
+            .price {
+                font-size: 2rem;
+            }
+
+            .track-btn {
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            h1::after {
+                right: -25px;
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            input[type="text"] {
+                padding: 15px 20px;
+                font-size: 0.9rem;
+            }
+
+            .price {
+                font-size: 1.8rem;
+            }
+
+            .track-btn {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
+
+            .cloud, .star {
+                display: none;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .loading-text {
+            color: #ff69b4;
+            font-weight: 600;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Crypto Price Tracker</h1>
-    <form method="POST">
-        <label for="coin">Enter Crypto Coin:</label>
-        <input type="text" id="coin" name="coin" required>
-        <button type="submit">Track</button>
-    </form>
+    <div class="floating-elements">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+        <div class="star star1"></div>
+        <div class="star star2"></div>
+        <div class="star star3"></div>
+        <div class="star star4"></div>
+    </div>
 
-    {% if coin_name %}
-        <h2>You searched for: {{ coin_name }}</h2>
-    {% endif %}
+    <div class="heart heart1">💕</div>
+    <div class="heart heart2">💖</div>
 
-    {% if price %}
-        <h2>Current Price (USD): {{ price }}</h2>
-    {% endif %}
+    <div class="container">
+        <h1>CRYPTO TRACKER</h1>
+        <p class="subtitle">Track your favorite cryptocurrencies</p>
+
+        <form method="POST" id="cryptoForm">
+            <div class="form-group">
+                <label for="coin" style="display: block; margin-bottom: 0.5rem; color: #ff69b4; font-weight: 600; font-size: 1.1rem;">Enter Crypto Coin:</label>
+                <input type="text" id="coin" name="coin" placeholder="Enter cryptocurrency name (e.g., bitcoin)" required>
+            </div>
+            <button type="submit" class="track-btn" id="trackBtn">
+                <span class="btn-text">Track</span>
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="loading-text">🔍 Searching for your crypto... 💫</div>
+        </div>
+
+        {% if coin_name %}
+        <div class="result-section">
+            <h2 style="color: #ff1493; font-size: 1.3rem; margin-bottom: 1rem;">You searched for: {{ coin_name }}</h2>
+            {% if price %}
+            <h2 style="color: #ff69b4; font-size: 1.5rem; margin-bottom: 1rem;">Current Price (USD): ${{ price }}</h2>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('cryptoForm');
+            const input = document.getElementById('coin');
+            const button = document.getElementById('trackBtn');
+            const loading = document.getElementById('loading');
+            const container = document.querySelector('.container');
+
+            // Kawaii input effects
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#ff69b4';
+                this.style.boxShadow = '0 0 20px rgba(255, 105, 180, 0.4)';
+                this.style.transform = 'scale(1.02)';
+
+                // Add sparkle effect
+                createSparkles(this);
+            });
+
+            input.addEventListener('blur', function() {
+                this.style.borderColor = '#ffb6c1';
+                this.style.boxShadow = '';
+                this.style.transform = 'scale(1)';
+            });
+
+            // Kawaii button effects
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) translateY(-2px)';
+                this.style.boxShadow = '0 8px 25px rgba(255, 105, 180, 0.6)';
+            });
+
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) translateY(0px)';
+                this.style.boxShadow = '0 5px 15px rgba(255, 105, 180, 0.4)';
+            });
+
+            button.addEventListener('click', function(e) {
+                this.style.transform = 'scale(0.98) translateY(0px)';
+
+                // Create heart explosion effect
+                createHeartExplosion(this);
+
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.05) translateY(-2px)';
+                }, 100);
+            });
+
+            // Form submission with kawaii loading
+            form.addEventListener('submit', function(e) {
+                button.disabled = true;
+                button.innerHTML = '<span class="btn-text">🔍 Searching...</span>';
+                loading.style.display = 'block';
+
+                // Add cute loading animation to container
+                container.style.animation = 'bounce 0.5s ease-in-out';
+
+                setTimeout(() => {
+                    container.style.animation = '';
+                }, 500);
+            });
+
+            // Kawaii typing effect
+            input.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.style.backgroundColor = 'rgba(255, 228, 225, 0.95)';
+                    this.style.color = '#d1477a';
+                } else {
+                    this.style.backgroundColor = 'rgba(255, 240, 245, 0.9)';
+                }
+            });
+
+            // Create sparkle effects
+            function createSparkles(element) {
+                const sparkles = ['✨', '💫', '⭐', '🌟'];
+
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        const sparkle = document.createElement('div');
+                        sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+                        sparkle.style.position = 'absolute';
+                        sparkle.style.fontSize = '1rem';
+                        sparkle.style.pointerEvents = 'none';
+                        sparkle.style.zIndex = '1000';
+                        sparkle.style.left = Math.random() * element.offsetWidth + 'px';
+                        sparkle.style.top = '-20px';
+                        sparkle.style.animation = 'sparkleFloat 1s ease-out forwards';
+
+                        element.parentElement.appendChild(sparkle);
+
+                        setTimeout(() => {
+                            sparkle.remove();
+                        }, 1000);
+                    }, i * 200);
+                }
+            }
+
+            // Create heart explosion effect
+            function createHeartExplosion(element) {
+                const hearts = ['💕', '💖', '💗', '💓', '💝'];
+
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                        heart.style.position = 'absolute';
+                        heart.style.fontSize = '1.2rem';
+                        heart.style.pointerEvents = 'none';
+                        heart.style.zIndex = '1000';
+                        heart.style.left = (element.offsetWidth / 2) + (Math.random() - 0.5) * 100 + 'px';
+                        heart.style.top = '50%';
+                        heart.style.transform = 'translate(-50%, -50%)';
+                        heart.style.animation = 'heartExplosion 1s ease-out forwards';
+
+                        element.parentElement.appendChild(heart);
+
+                        setTimeout(() => {
+                            heart.remove();
+                        }, 1000);
+                    }, i * 100);
+                }
+            }
+
+            // Add CSS animations for sparkles and hearts
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes sparkleFloat {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(0px) scale(0.5);
+                    }
+                    50% {
+                        opacity: 1;
+                        transform: translateY(-15px) scale(1);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translateY(-30px) scale(0.5);
+                    }
+                }
+
+                @keyframes heartExplosion {
+                    0% {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(0.5);
+                    }
+                    50% {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1.2);
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.5) translateY(-50px);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Random kawaii messages
+            const kawaiMessages = [
+                "Looking for crypto prices! (◕‿◕)",
+                "Searching the blockchain! ✨",
+                "Finding your coin! 🔍💕",
+                "Almost there! (˘▾˘)~",
+                "Crypto magic happening! 🌟"
+            ];
+
+            // Update loading message randomly
+            setInterval(() => {
+                if (loading.style.display === 'block') {
+                    const randomMessage = kawaiMessages[Math.floor(Math.random() * kawaiMessages.length)];
+                    loading.innerHTML = `<div class="loading-text">${randomMessage}</div>`;
+                }
+            }, 2000);
+        });
+    </script>
 </body>
 </html>
