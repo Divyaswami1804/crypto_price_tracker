@@ -19,6 +19,11 @@ def home():
 
         #call the API
         response = requests.get(url)
+
+        print("URL:", url)
+        print("Status code:", response.status_code)
+        print("Response text:", response.text)
+
         if response.status_code == 200:
             data = response.json()
             if coin_name in data:
