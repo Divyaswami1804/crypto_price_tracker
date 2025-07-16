@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crypto Price Tracker</title>
+</head>
+<body>
+    <h1>Crypto Price Tracker</h1>
+    <form method="POST">
+        <label for="coin">Enter Crypto Coin:</label>
+        <input type="text" id="coin" name="coin" required>
+        <button type="submit">Track</button>
+    </form>
+
+    {% if coin_name %}
+        <h2>You searched for: {{ coin_name }}</h2>
+    {% endif %}
+</body>
+</html>
