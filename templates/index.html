@@ -512,7 +512,17 @@
             {% if price %}
             <h2 style="color: #ff69b4; font-size: 1.5rem; margin-bottom: 1rem;">Current Price (USD): ${{ price }}</h2>
             {% endif %}
+
         </div>
+        {% if last_searches %}
+            <h3 style="margin-top: 30px; color: #fff;">Recent Searches:</h3>
+                <ul style="list-style: none; padding: 0; color: #fff;">
+                    {% for coin, price, timestamp in last_searches %}
+                <li>{{ coin }} → ${{ price }} at {{ timestamp }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
         {% endif %}
     </div>
 
